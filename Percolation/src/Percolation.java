@@ -16,14 +16,13 @@ public class Percolation {
     public Percolation(int size) {
         numRows = size;
         sites = new boolean[size][size];
-        grid = new WeightedQuickUnionUF(numRows + 2); //+2 for two virtual sites.
+        grid = new WeightedQuickUnionUF(numRows * numRows + 2); //+2 for two virtual sites.
 
         //connecting the virtual sites to the top and the bottom row
         for (int i = 0; i < size; i++) {
             grid.union(0, i + 1);
-            grid.union(numRows * numRows + 1, sites.length - i);
+            grid.union(numRows * numRows + 1, numRows * numRows - i);
         }
-
     }
 
     /*
@@ -44,19 +43,22 @@ public class Percolation {
         if (!sites[rowIndex][columnIndex]) { //if closed
             sites[rowIndex][columnIndex] = true;
 
-            int gridIndexOfCurrent = gridIndexFromXY(rowIndex, columnIndex);
+            int gridIndexOfCurrent = gridIndexFromXY(rowIndex, j);
 
             if (columnIndex + 1 < numRows && sites[rowIndex][columnIndex + 1]) { //Right
-                int gridIndexOfRight = gridIndexFromXY(rowIndex, columnIndex + 1);
+                int gridIndexOfRight = gridIndexFromXY(rowIndex, j + 1);
                 grid.union(gridIndexOfCurrent, gridIndexOfRight);
-            } else if (columnIndex - 1 >= 0 && sites[rowIndex][columnIndex - 1]) { //Left
-                int gridIndexOfLeft = gridIndexFromXY(rowIndex, columnIndex - 1);
+            }
+            if (columnIndex - 1 >= 0 && sites[rowIndex][columnIndex - 1]) { //Left
+                int gridIndexOfLeft = gridIndexFromXY(rowIndex, j - 1);
                 grid.union(gridIndexOfCurrent, gridIndexOfLeft);
-            } else if (rowIndex - 1 >= 0 && sites[rowIndex - 1][columnIndex]) { //Top
-                int gridIndexOfTop = gridIndexFromXY(rowIndex - 1, columnIndex);
+            }
+            if (rowIndex - 1 >= 0 && sites[rowIndex - 1][columnIndex]) { //Top
+                int gridIndexOfTop = gridIndexFromXY(rowIndex - 1, j);
                 grid.union(gridIndexOfCurrent, gridIndexOfTop);
-            } else if (rowIndex + 1 < numRows && sites[rowIndex + 1][columnIndex]) { //Bottom
-                int gridIndexOfBottom = gridIndexFromXY(rowIndex + 1, columnIndex);
+            }
+            if (rowIndex + 1 < numRows && sites[rowIndex + 1][columnIndex]) { //Bottom
+                int gridIndexOfBottom = gridIndexFromXY(rowIndex + 1, j);
                 grid.union(gridIndexOfCurrent, gridIndexOfBottom);
             }
         }
